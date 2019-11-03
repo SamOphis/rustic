@@ -6,7 +6,7 @@ extern crate multipart;
 extern crate rocket;
 
 use std::fs::File;
-use std::io::{self, Write};
+use std::io::copy;
 
 use multipart::server::Multipart;
 use multipart::server::save::SaveResult::*;
@@ -24,10 +24,17 @@ fn image_upload(content_type: &ContentType, data: Data) -> Result<Status, Custom
     let (_, boundary) = content_type.params().find(|&(key, _)| key == "boundary")
         .ok_or_else(|| Custom(Status::BadRequest, "multipart/form-data boundary parameter not provided".into()))?;
 
-    let mut output = Vec::new();
     let mut multipart = Multipart::with_body(data.open(), boundary);
     match multipart.save().size_limit(10000000).temp() {
         Full(entries) => {
+            let mut file = match File::create("image_test.png") {
+                Ok(file) => file,
+                Err(error) => {
+                    println!("Error occurred on File Creation! {:?}", error);
+                    return Err(Custom(Status::InternalServerError, error.to_string()))
+                }
+            };
+
             for fields in entries.fields.values() {
                 for field in fields.iter() {
                     let mut data = match field.data.readable() {
@@ -37,12 +44,14 @@ fn image_upload(content_type: &ContentType, data: Data) -> Result<Status, Custom
                             return Err(Custom(Status::InternalServerError, error.to_string()))
                         }
                     };
-                    if let Err(error) = io::copy(&mut data, &mut output) {
+                    if let Err(error) = copy(&mut data, &mut file) {
                         println!("Error occurred while copying data to file! {:?}", error);
                         return Err(Custom(Status::InternalServerError, error.to_string()))
                     }
                 }
             }
+
+            return Ok(Status::NoContent)
         },
         Partial(_, reason) => {
             println!("Operation quit unexpectedly while processing a file upload! {:?}", reason);
@@ -51,21 +60,6 @@ fn image_upload(content_type: &ContentType, data: Data) -> Result<Status, Custom
         Error(error) => {
             println!("An error occurred while processing a file upload! {:?}", error);
             return Err(Custom(Status::InternalServerError, error.to_string()))
-        }
-    };
-
-    let mut file = match File::create("image_test.png") {
-        Ok(file) => file,
-        Err(error) => {
-            println!("Error occurred on File Creation! {:?}", error);
-            return Err(Custom(Status::InternalServerError, error.to_string()))
-        }
-    };
-    match file.write_all(output.as_mut_slice()) {
-        Ok(()) => Ok(Status::NoContent),
-        Err(error) => {
-            println!("An error occurred when writing output to file! {:?}", error);
-            Err(Custom(Status::InternalServerError, error.to_string()))
         }
     }
 }
