@@ -7,12 +7,42 @@ extern crate rocket;
 
 use std::fs::File;
 use std::io::copy;
+use std::path::PathBuf;
 
+use base64::{CharacterSet, Config, encode_config, URL_SAFE, URL_SAFE_NO_PAD};
 use multipart::server::Multipart;
 use multipart::server::save::SaveResult::*;
+use rand::Rng;
 use rocket::Data;
 use rocket::http::{ContentType, Status};
 use rocket::response::status::Custom;
+
+const MAX_FILE_ID: u64 = 281474976710656;
+// 64^8
+const MEDIA_DIRECTORY: &'static str = "media/";
+
+fn retrieve_new_file() -> std::io::Result<File> {
+    loop {
+        let rand = rand::thread_rng().gen_range(0, MAX_FILE_ID);
+        let bytes = rand.to_le_bytes();
+
+        let mut last_non_zero = 7;
+        while last_non_zero > 0 && bytes[last_non_zero] == 0 {
+            last_non_zero = last_non_zero - 1;
+        }
+
+        let mut id = encode_config(&bytes[..last_non_zero], URL_SAFE_NO_PAD);
+        id.push_str(".png");
+
+        let mut path_buf = PathBuf::from(MEDIA_DIRECTORY);
+        path_buf.push(&id);
+
+        if !path_buf.exists() {
+            println!("{:?}", path_buf);
+            return File::create(path_buf)
+        }
+    };
+}
 
 #[post("/upload/image", data = "<data>")]
 fn image_upload(content_type: &ContentType, data: Data) -> Result<Status, Custom<String>> {
@@ -27,7 +57,7 @@ fn image_upload(content_type: &ContentType, data: Data) -> Result<Status, Custom
     let mut multipart = Multipart::with_body(data.open(), boundary);
     match multipart.save().size_limit(10000000).temp() {
         Full(entries) => {
-            let mut file = match File::create("image_test.png") {
+            let mut file = match retrieve_new_file() {
                 Ok(file) => file,
                 Err(error) => {
                     println!("Error occurred on File Creation! {:?}", error);
