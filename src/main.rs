@@ -38,6 +38,7 @@ fn image_upload(content_type: &ContentType, data: Data) -> Result<Status, Custom
                         }
                     };
                     if let Err(error) = io::copy(&mut data, &mut output) {
+                        println!("Error occurred while copying data to file! {:?}", error);
                         return Err(Custom(Status::InternalServerError, error.to_string()))
                     }
                 }
@@ -62,7 +63,10 @@ fn image_upload(content_type: &ContentType, data: Data) -> Result<Status, Custom
     };
     match file.write_all(output.as_mut_slice()) {
         Ok(()) => Ok(Status::NoContent),
-        Err(error) => Err(Custom(Status::InternalServerError, error.to_string()))
+        Err(error) => {
+            println!("An error occurred when writing output to file! {:?}", error);
+            Err(Custom(Status::InternalServerError, error.to_string()))
+        }
     }
 }
 
