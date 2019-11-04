@@ -65,7 +65,6 @@ fn retrieve_new_file() -> std::io::Result<(PathBuf, File)> {
         }
 
         let mut id = encode_config(&bytes[..last_non_zero], URL_SAFE_NO_PAD);
-        id.push_str(".png");
 
         let mut path_buf = PathBuf::from(&*MEDIA_DIRECTORY);
         path_buf.push(&id);

@@ -17,12 +17,14 @@ web framework. Rustic can be built the same way any other Cargo project can, via
 this is unnecessary if using a pre-built release.
 
 ## First Iteration
-The first iteration of this project is just a generic image server. When paired with a compatible uploader executable,
-an image is uploaded to a given site (when authorized) and gets given a unique identifier and URL to accompany it,
-which can then be embedded anywhere for any amount of time. Images will never expire unless manually deleted.
+The first iteration of this project is just a generic media server. It accepts `multipart/form-data` uploads, with
+each entry being limited to 10MB. This limit is unconfigurable as of version 0.3.0. When uploading images, the
+file name is returned (without the extension as of 0.3.0). This name can be used to fetch the media source you uploaded.
 
-**Note:** Media files, so far, are PNG images with base64 random ID's. ID's are bounded to 64^8 which is more images
-than you could ever hope of exhausting. They're stored in a `media` directory which must be created in the application
-working directory beforehand. Future iterations/versions of Rustic will be way more configurable and automated, with
-more media types supported too (video, audio, etc.)
+Media will never expire unless manually deleted, and all media is assigned a unique random base64-encoded ID. This ID is
+an unsigned 128-bit integer, and the maximum bound can be configured with the `MAX_FILE_ID` environment variable,
+which defaults to `64^8`. Media is stored in a directory specified by the optional environment variable `MEDIA_DIRECTORY`,
+which defaults to `media/`.
+
+> **Note:** As of 0.3.0, when specifying a custom media directory, the name **must** end with a `/`.
 
