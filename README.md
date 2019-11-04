@@ -3,7 +3,7 @@ Rustic is a personal media server made for two reasons:
 * to get familiar with [Rust](https://www.rust-lang.org).
 * to get familiar with writing server applications.
 * to deal with [Flameshot](https://flameshot.js.org/#/) custom image uploads.
-    * note: flameshot custom uploader should be added here or in my [dotfiles](https://github.com/SamOphis/dotfiles).
+    * note: flameshot custom uploader application can be found [here.](https://github.com/SamOphis/dotfiles/tree/master/home/sam/.local)
     * note: [ShareX](https://github.com/ShareX/ShareX) compatibility is not a goal in mind as of writing this.
 
 # Usage in Production
@@ -38,7 +38,7 @@ however this does default to `/api/v1` if the variable isn't present.
 #### POST `<base path>/media` -- `multipart/form-data`
 * **This requires authorization.**
 * Uploads media to Rustic. The ID of the newly-uploaded file is returned as a string with 200 OK.
-* If this operation fails, 500 Internal Server Error is returned along with a description of the error.
+* If this operation fails, 500 Internal Serve4r Error is returned along with a description of the error.
 
 #### DELETE `<base path>/media/<id>`
 * **This requires authorization.**
@@ -51,11 +51,11 @@ again, with a description of the error.
 
 ## Rocket Configuration
 Rocket allows you to configure many aspects of the web server. The defaults are almost always good enough,
-but if you want to fine-tune things go ahead and modify the `Rocket.toml` file included in this repository
+but if you want to fine-tune things go ahead and modify the [Rocket.toml](https://github.com/SamOphis/rustic/blob/master/Rocket.toml) file included in this repository
 and then restart Rustic.
 
 By default, Rocket will search the working directory first and then every subsequent parent until it reaches root.
-For faster start-up times, try to keep the file in the working directory instead of elsewhere.
+For faster start-up times, try to keep the file in the working directory instead of elsewhere, although the difference will be negligible.
 
 
 
