@@ -15,6 +15,7 @@ use multipart::server::save::SaveResult::*;
 use rand::Rng;
 use rocket::Data;
 use rocket::http::{ContentType, Status};
+use rocket::response::NamedFile;
 use rocket::response::status::Custom;
 
 const MAX_FILE_ID: u64 = 281474976710656;
@@ -41,6 +42,15 @@ fn retrieve_new_file() -> std::io::Result<File> {
             return File::create(path_buf)
         }
     };
+}
+
+#[get("/images/<id>")]
+fn get_image(id: String) -> Result<NamedFile, Status> {
+    let mut path_buf = PathBuf::from(MEDIA_DIRECTORY);
+    path_buf.push(id);
+
+    NamedFile::open(path_buf)
+        .map_err(|_| Status::NotFound)
 }
 
 #[post("/upload/image", data = "<data>")]
@@ -94,5 +104,8 @@ fn image_upload(content_type: &ContentType, data: Data) -> Result<Status, Custom
 }
 
 fn main() {
-    rocket::ignite().mount("/api/v1", routes![image_upload]).launch();
+    rocket::ignite()
+        .mount("/api/v1", routes![image_upload])
+        .mount("/api/v1", routes![get_image])
+        .launch();
 }
