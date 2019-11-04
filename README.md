@@ -31,3 +31,19 @@ for any authorization-requiring request to be performed.
 
 > **Note:** As of 0.3.0, when specifying a custom media directory, the name **must** end with a `/`.
 
+## Routes
+#### POST `/api/v1/media` -- `multipart/form-data`
+* **This requires authorization.**
+* Uploads media to Rustic. The ID of the newly-uploaded file is returned as a string with 200 OK.
+* If this operation fails, 500 Internal Server Error is returned along with a description of the error.
+
+#### DELETE `/api/v1/media/<id>`
+* **This requires authorization.**
+* Deletes the file associated with the ID if present. On success, 204 No Content is returned, otherwise 404 Not Found is.
+
+#### GET `/media/<id>`
+* **The base URL is different for this, for convenience sake.**
+* Fetches the file associated with the ID if present with 200 OK.
+
+
+

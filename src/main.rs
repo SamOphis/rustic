@@ -83,6 +83,25 @@ fn retrieve_new_file() -> std::io::Result<(PathBuf, File)> {
     };
 }
 
+#[delete("/media/<id>")]
+fn delete_media(_guard: AuthorizationGuard, id: String) -> Result<Status, Custom<String>> {
+    let mut path_buf = PathBuf::from(&*MEDIA_DIRECTORY);
+    path_buf.push(&id);
+
+    if path_buf.exists() {
+        match std::fs::remove_file(path_buf) {
+            Ok(()) => Ok(Status::NoContent),
+            Err(error) => {
+                println!("An error occurred while attempting to remove file {}. {:?}", id, error);
+                Err(Custom(Status::InternalServerError, error.to_string()))
+            }
+        }
+    } else {
+        println!("Attempt to remove file which doesn't even exist? ID: {}", id);
+        Err(Custom(Status::NotFound, "Resource not present on this server.".to_string()))
+    }
+}
+
 #[get("/media/<id>")]
 fn get_media(id: String) -> Result<NamedFile, Status> {
     let mut path_buf = PathBuf::from(&*MEDIA_DIRECTORY);
@@ -92,7 +111,7 @@ fn get_media(id: String) -> Result<NamedFile, Status> {
         .map_err(|_| Status::NotFound)
 }
 
-#[post("/upload/media", data = "<data>")]
+#[post("/media", data = "<data>")]
 fn media_upload(_guard: AuthorizationGuard, content_type: &ContentType, data: Data) -> Result<String, Custom<String>> {
     // the following checks can be implemented with rocket request guards but I despise them.
 
@@ -158,6 +177,7 @@ fn media_upload(_guard: AuthorizationGuard, content_type: &ContentType, data: Da
 fn main() {
     rocket::ignite()
         .mount("/api/v1/", routes![media_upload])
+        .mount("/api/v1/", routes![delete_media])
         .mount("/", routes![get_media])
         .launch();
 }
