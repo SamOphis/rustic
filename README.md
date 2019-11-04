@@ -26,5 +26,8 @@ an unsigned 128-bit integer, and the maximum bound can be configured with the `M
 which defaults to `64^8`. Media is stored in a directory specified by the optional environment variable `MEDIA_DIRECTORY`,
 which defaults to `media/`.
 
+All environment variables are processed lazily. An `AUTHORIZATION` environment variable ***must*** be present
+for any authorization-requiring request to be performed.
+
 > **Note:** As of 0.3.0, when specifying a custom media directory, the name **must** end with a `/`.
 
