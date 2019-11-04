@@ -32,18 +32,21 @@ for any authorization-requiring request to be performed.
 > **Note:** As of 0.3.0, when specifying a custom media directory, the name **must** end with a `/`.
 
 ## Routes
-#### POST `/api/v1/media` -- `multipart/form-data`
+* `<base path>` refers to the path specified at configuration by the `RUSTIC_API_BASE_PATH` environment variable,
+however this does default to `/api/v1` if the variable isn't present.
+
+#### POST `<base path>/media` -- `multipart/form-data`
 * **This requires authorization.**
 * Uploads media to Rustic. The ID of the newly-uploaded file is returned as a string with 200 OK.
 * If this operation fails, 500 Internal Server Error is returned along with a description of the error.
 
-#### DELETE `/api/v1/media/<id>`
+#### DELETE `<base path>/media/<id>`
 * **This requires authorization.**
 * Deletes the file associated with the ID if present. On success, 204 No Content is returned, otherwise 404 Not Found is.
 * If the operation fails (i.e because of a lack of permissions on the server side), 500 Internal Server Error is returned,
 again, with a description of the error.
 
-#### GET `/api/v1/media/<id>`
+#### GET `<base path>/media/<id>`
 * Fetches the file associated with the ID if present with 200 OK.
 
 
