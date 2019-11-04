@@ -9,7 +9,7 @@ use std::fs::File;
 use std::io::copy;
 use std::path::PathBuf;
 
-use base64::{CharacterSet, Config, encode_config, URL_SAFE, URL_SAFE_NO_PAD};
+use base64::{encode_config, URL_SAFE_NO_PAD};
 use multipart::server::Multipart;
 use multipart::server::save::SaveResult::*;
 use rand::Rng;
