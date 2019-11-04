@@ -15,7 +15,7 @@ use multipart::server::Multipart;
 use multipart::server::save::SaveResult::*;
 use once_cell::sync::Lazy;
 use rand::Rng;
-use rocket::Data;
+use rocket::{Config, Data};
 use rocket::http::{ContentType, Status};
 use rocket::response::NamedFile;
 use rocket::response::status::Custom;
@@ -25,14 +25,14 @@ use requests::AuthorizationGuard;
 mod requests;
 
 pub static AUTHORIZATION: Lazy<String> = Lazy::new(|| {
-    var("AUTHORIZATION").expect("Authorization Key **must** be provided.")
+    var("RUSTIC_API_AUTHORIZATION").expect("Authorization Key **must** be provided.")
 });
 
 static MEDIA_DIRECTORY: Lazy<String> = Lazy::new(|| {
-    let dir = match var("MEDIA_DIRECTORY") {
+    let dir = match var("RUSTIC_MEDIA_DIRECTORY") {
         Ok(dir) => dir,
         Err(error) => {
-            println!("Error occurred while obtaining MEDIA_DIRECTORY env var. Defaulting to media/ | {:?}", error);
+            println!("Error occurred while obtaining RUSTIC_MEDIA_DIRECTORY env var. Defaulting to media/ | {:?}", error);
             String::from("media/")
         }
     };
@@ -47,16 +47,16 @@ static MEDIA_DIRECTORY: Lazy<String> = Lazy::new(|| {
 });
 
 static MAX_FILE_ID: Lazy<u128> = Lazy::new(|| {
-    match var("MAX_FILE_ID") {
+    match var("RUSTIC_MAX_FILE_ID") {
         Ok(max) => match max.trim().parse::<u128>() {
             Ok(max) => max,
             Err(error) => {
-                println!("Error when parsing MAX_FILE_ID into u128. Defaulting to 64^8. {:?}", error);
+                println!("Error when parsing RUSTIC_MAX_FILE_ID into u128. Defaulting to 64^8. {:?}", error);
                 281474976710656
             }
         },
         Err(error) => {
-            println!("Error occurred while obtaining MAX_FILE_ID env var. Defaulting to 64^8. {:?}", error);
+            println!("Error occurred while obtaining RUSTIC_MAX_FILE_ID env var. Defaulting to 64^8. {:?}", error);
             281474976710656
         }
     }
@@ -175,9 +175,18 @@ fn media_upload(_guard: AuthorizationGuard, content_type: &ContentType, data: Da
 }
 
 fn main() {
-    rocket::ignite()
-        .mount("/api/v1/", routes![media_upload])
-        .mount("/api/v1/", routes![delete_media])
-        .mount("/api/v1/", routes![get_media])
-        .launch();
+    let base_path = match var("RUSTIC_API_BASE_PATH") {
+        Ok(base_path) => base_path,
+        Err(error) => {
+            println!("An error occurred when fetching RUSTIC_API_BASE_PATH env var. Defaulting to /api/v1/. {:?}", error);
+            String::from("/api/v1/")
+        }
+    };
+
+    let rocket = rocket::ignite()
+        .mount(&base_path, routes![media_upload])
+        .mount(&base_path, routes![delete_media])
+        .mount(&base_path, routes![get_media]);
+
+    rocket.launch();
 }
