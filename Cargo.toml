@@ -1,6 +1,6 @@
 [package]
 name = "rustic"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["sam"]
 edition = "2018"
 
