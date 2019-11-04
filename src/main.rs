@@ -148,7 +148,7 @@ fn image_upload(content_type: &ContentType, data: Data) -> Result<String, Custom
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![image_upload])
-        .mount("/api/v1", routes![get_image])
+        .mount("/api/v1", routes![image_upload])
+        .mount("/", routes![get_image])
         .launch();
 }
