@@ -20,6 +20,14 @@ use rocket::http::{ContentType, Status};
 use rocket::response::NamedFile;
 use rocket::response::status::Custom;
 
+use requests::AuthorizationGuard;
+
+mod requests;
+
+pub static AUTHORIZATION: Lazy<String> = Lazy::new(|| {
+    var("AUTHORIZATION").expect("Authorization Key **must** be provided.")
+});
+
 static MEDIA_DIRECTORY: Lazy<String> = Lazy::new(|| {
     let dir = match var("MEDIA_DIRECTORY") {
         Ok(dir) => dir,
@@ -85,8 +93,9 @@ fn get_media(id: String) -> Result<NamedFile, Status> {
 }
 
 #[post("/upload/media", data = "<data>")]
-fn media_upload(content_type: &ContentType, data: Data) -> Result<String, Custom<String>> {
+fn media_upload(_guard: AuthorizationGuard, content_type: &ContentType, data: Data) -> Result<String, Custom<String>> {
     // the following checks can be implemented with rocket request guards but I despise them.
+
     if !content_type.is_form_data() {
         return Err(Custom(Status::BadRequest, "Expected Content-Type multipart/form-data".into()));
     }
