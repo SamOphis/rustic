@@ -22,11 +22,11 @@ each entry being limited to 10MB. This limit is unconfigurable as of version 0.3
 file name is returned (without the extension as of 0.3.0). This name can be used to fetch the media source you uploaded.
 
 Media will never expire unless manually deleted, and all media is assigned a unique random base64-encoded ID. This ID is
-an unsigned 128-bit integer, and the maximum bound can be configured with the `MAX_FILE_ID` environment variable,
-which defaults to `64^8`. Media is stored in a directory specified by the optional environment variable `MEDIA_DIRECTORY`,
+an unsigned 128-bit integer, and the maximum bound can be configured with the `RUSTIC_MAX_FILE_ID` environment variable,
+which defaults to `64^8`. Media is stored in a directory specified by the optional environment variable `RUSTIC_MEDIA_DIRECTORY`,
 which defaults to `media/`.
 
-All environment variables are processed lazily. An `AUTHORIZATION` environment variable ***must*** be present
+All environment variables are processed lazily. A `RUSTIC_API_AUTHORIZATION` environment variable ***must*** be present
 for any authorization-requiring request to be performed.
 
 > **Note:** As of 0.3.0, when specifying a custom media directory, the name **must** end with a `/`.
