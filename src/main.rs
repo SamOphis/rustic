@@ -75,8 +75,8 @@ fn retrieve_new_file() -> std::io::Result<(PathBuf, File)> {
     };
 }
 
-#[get("/images/<id>")]
-fn get_image(id: String) -> Result<NamedFile, Status> {
+#[get("/media/<id>")]
+fn get_media(id: String) -> Result<NamedFile, Status> {
     let mut path_buf = PathBuf::from(&*MEDIA_DIRECTORY);
     path_buf.push(id);
 
@@ -84,8 +84,8 @@ fn get_image(id: String) -> Result<NamedFile, Status> {
         .map_err(|_| Status::NotFound)
 }
 
-#[post("/upload/image", data = "<data>")]
-fn image_upload(content_type: &ContentType, data: Data) -> Result<String, Custom<String>> {
+#[post("/upload/media", data = "<data>")]
+fn media_upload(content_type: &ContentType, data: Data) -> Result<String, Custom<String>> {
     // the following checks can be implemented with rocket request guards but I despise them.
     if !content_type.is_form_data() {
         return Err(Custom(Status::BadRequest, "Expected Content-Type multipart/form-data".into()));
@@ -148,7 +148,7 @@ fn image_upload(content_type: &ContentType, data: Data) -> Result<String, Custom
 
 fn main() {
     rocket::ignite()
-        .mount("/api/v1", routes![image_upload])
-        .mount("/", routes![get_image])
+        .mount("/api/v1/", routes![media_upload])
+        .mount("/", routes![get_media])
         .launch();
 }
