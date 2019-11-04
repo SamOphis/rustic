@@ -178,6 +178,6 @@ fn main() {
     rocket::ignite()
         .mount("/api/v1/", routes![media_upload])
         .mount("/api/v1/", routes![delete_media])
-        .mount("/", routes![get_media])
+        .mount("/api/v1/", routes![get_media])
         .launch();
 }

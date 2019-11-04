@@ -41,7 +41,7 @@ for any authorization-requiring request to be performed.
 * **This requires authorization.**
 * Deletes the file associated with the ID if present. On success, 204 No Content is returned, otherwise 404 Not Found is.
 
-#### GET `/media/<id>`
+#### GET `/api/v1/media/<id>`
 * **The base URL is different for this, for convenience sake.**
 * Fetches the file associated with the ID if present with 200 OK.
 
