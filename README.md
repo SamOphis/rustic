@@ -49,5 +49,13 @@ again, with a description of the error.
 #### GET `<base path>/media/<id>`
 * Fetches the file associated with the ID if present with 200 OK.
 
+## Rocket Configuration
+Rocket allows you to configure many aspects of the web server. The defaults are almost always good enough,
+but if you want to fine-tune things go ahead and modify the `Rocket.toml` file included in this repository
+and then restart Rustic.
+
+By default, Rocket will search the working directory first and then every subsequent parent until it reaches root.
+For faster start-up times, try to keep the file in the working directory instead of elsewhere.
+
 
 
