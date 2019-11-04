@@ -18,7 +18,6 @@ use rocket::http::{ContentType, Status};
 use rocket::response::status::Custom;
 
 const MAX_FILE_ID: u64 = 281474976710656;
-// 64^8
 const MEDIA_DIRECTORY: &'static str = "media/";
 
 fn retrieve_new_file() -> std::io::Result<File> {
